@@ -67,23 +67,31 @@
 
 <script>
 import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
-
 export default {
   name: 'results',
+  beforeMount () {
+    // const { type, id } = this.$route.params
+    this.setResults([this.$route.params.type, this.$route.params.id])
+  },
   data () {
-    return {
-      count: 0
-    }
+    return {}
   },
   computed: {
-    ...mapState([]),
+    ...mapState(['searchResult', 'resultsLoaded', 'details', 'detailsLoaded']),
     ...mapGetters([])
   },
   methods: {
-    ...mapMutations(['REMOVE_LINK']),
-    ...mapActions(['removeLink'])
-  },
-  actions: {}
+    ...mapMutations(['SET_DETAILS', 'SET_DETAILS_LOADED']),
+    ...mapActions(['fetchData', 'getDetails']),
+
+    setResults: function (payload) {
+      this.fetchData(payload)
+    },
+
+    fetchDetails: function (payload) {
+      this.getDetails(payload)
+    }
+  }
 }
 </script>
 
