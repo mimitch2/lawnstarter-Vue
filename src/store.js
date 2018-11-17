@@ -21,30 +21,29 @@ export default new Vuex.Store({
     },
     SET_RESULTS_LOADED: (state, bool) => {
       state.resultsLoaded = bool
-      console.log(state.resultsLoaded)
     },
     SET_DETAILS: (state, result) => {
       state.details = result
     },
     SET_DETAILS_LOADED: (state, bool) => {
       state.detailsLoaded = bool
-      console.log(state.detailsLoaded)
     }
   },
   actions: {
     async fetchData (context, payload) {
-      console.log(payload)
       try {
         const getData = await fetch(
           `https://swapi.co/api/${payload[0]}/?search=${payload[1]}`
         )
         const result = await getData.json()
-        context.commit('SET_RESULTS', result.results)
+        const finalData = result.results
+
+        context.commit('SET_RESULTS', finalData)
         context.commit('SET_RESULTS_LOADED', true)
-        if (payload[0] === 'films' && result.length > 0) {
-          context.dispatch('getDetails', result.results[0].characters)
-        } else if (payload[0] === 'people' && result.length > 0) {
-          context.dispatch('getDetails', result.results[0].films)
+        if (payload[0] === 'films' && finalData.length === 1) {
+          context.dispatch('getDetails', finalData[0].characters)
+        } else if (payload[0] === 'people' && finalData.length === 1) {
+          context.dispatch('getDetails', finalData[0].films)
         }
       } catch (error) {
         console.log(error)
@@ -52,12 +51,13 @@ export default new Vuex.Store({
     },
 
     async getDetails (context, array) {
+      console.log(array)
       let tempArr = []
       for (let i = 0; i < array.length; i++) {
         try {
           const getData = await fetch(array[i])
           const result = await getData.json()
-          tempArr.push(result)
+          tempArr = [...tempArr, result]
         } catch (error) {
           console.log(error)
         }

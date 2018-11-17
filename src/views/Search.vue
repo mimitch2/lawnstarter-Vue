@@ -21,44 +21,47 @@
             <input
               class="search-input"
               type="text"
-              :placeholder="placeholder"
+              :placeholder="this.type === 'people' ? 'e.g. Chewbacca, Yoda, Boba Fett' : 'e.g. A New Hope, Phantom Menace'"
               v-model="searchInput"
             >
-            <button class="SearchButton" v-on:click="setResults" v-if="searchStatus">SEARCHING</button>
-            <button class="SearchButton" v-on:click="setResults" v-if="!searchStatus">SEARCH</button>
+            <button
+              v-bind:class="{ active: searchInput.length > 0 }"
+              class="SearchButton"
+              v-on:click="setResults"
+            >{{searchStatus ? "SEARCHING..." : "SEARCH"}}</button>
           </form>
         </div>
       </div>
       <div class="results-div">
         <div class="results">Results</div>
-        <ul class="results-list">
+        <ul class="results-list" v-if="searchInput">
           <li
+            class="result-item"
             v-if="type === 'films' && resultsLoaded"
             v-for="(item, index) in searchResult"
             v-bind:key="index"
           >
             {{ item.title }}
-            <button v-on:click="setResultsLoaded(false)">
-              <router-link v-bind:to="`/films/${item.title}`">DETAILS</router-link>
+            <button class="detail-button">
+              <router-link v-bind:to="`/films/${item.title}`">SEE DETAILS</router-link>
             </button>
           </li>
-          <li v-if="type === 'people'" v-for="(item, index) in searchResult" v-bind:key="index">
+          <li
+            class="result-item"
+            v-if="type === 'people'"
+            v-for="(item, index) in searchResult"
+            v-bind:key="index"
+          >
             {{ item.name }}
-            <button v-on:click="setResultsLoaded(false)">
+            <button class="detail-button">
               <router-link v-bind:to="`/people/${item.name}`">DETAILS</router-link>
             </button>
           </li>
         </ul>
         <div class="resutls-feedback-container">
-          <div class="results-feedback-message">
-            <p
-              class="results-feedback-text"
-              v-if="searchResult.length === 0 && resultsLoaded && !searchStatus"
-            >There are no matches.</p>
-            <p
-              class="results-feedback-text"
-              v-if="!resultsLoaded && !searchStatus"
-            >Use the form to search for People or Movies.</p>
+          <div class="results-feedback-message" v-if="searchResult.length === 0 && !searchStatus">
+            <p class="results-feedback-text">There are no matches.</p>
+            <p class="results-feedback-text">Use the form to search for People or Movies.</p>
           </div>
           <div class="resutls-feedback-message" v-if="searchStatus">
             <p>Searching...</p>
@@ -75,13 +78,13 @@ export default {
   name: 'search',
   beforeMount () {
     this.clearResults()
-    this.setResultsLoaded(false)
   },
   data () {
     return {
       searchInput: '',
       type: 'people',
-      placeholder: 'e.g Chewbaca,...',
+      placeholder:
+        this.type === 'people' ? 'e.g Chewbaca,...' : 'e.g. A New Hope...',
       searchStatus: false
     }
   },
@@ -95,22 +98,32 @@ export default {
       if (this.resultsLoaded) {
         this.searchStatus = false
       }
+    },
+    searchInput () {
+      if (!this.searchInput) {
+        this.SET_RESULTS([])
+        this.SET_RESULTS_LOADED(false)
+      }
+    },
+    type () {
+      this.SET_RESULTS([])
+      this.SET_RESULTS_LOADED(false)
     }
   },
   methods: {
     ...mapMutations(['SET_RESULTS', 'SET_RESULTS_LOADED']),
     ...mapActions(['fetchData']),
     setResults: function () {
-      this.SET_RESULTS([])
-      this.SET_RESULTS_LOADED(false)
-      this.fetchData([this.type, this.searchInput])
-      this.searchStatus = true
+      if (this.searchInput) {
+        this.SET_RESULTS([])
+        this.SET_RESULTS_LOADED(false)
+        this.fetchData([this.type, this.searchInput])
+        this.searchStatus = true
+      }
     },
     clearResults: function () {
       this.SET_RESULTS([])
-    },
-    setResultsLoaded: function (bool) {
-      this.SET_RESULTS_LOADED(bool)
+      this.SET_RESULTS_LOADED(false)
     }
   }
 }
@@ -118,5 +131,190 @@ export default {
 
 <style scoped>
 .search-root {
+  margin-top: 80px;
+}
+input[type='radio'] {
+  color: #0094ff;
+  width: 16px;
+  height: 16px;
+}
+input::placeholder {
+  color: #c4c4c4;
+}
+a {
+  color: #ffffff;
+  text-decoration: none;
+}
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+.content-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.search-div {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px 0 rgba(132, 132, 132, 0.75);
+  border: solid 1px #dadada;
+  background-color: #ffffff;
+  width: 410px;
+  height: 230px;
+}
+.search-content-wrapper {
+  margin-left: 30px;
+}
+.What-are-you-searching-for {
+  margin-top: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #383838;
+}
+.radio-group {
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  display: flex;
+  align-items: center;
+}
+.People {
+  margin-right: 26px;
+}
+.People,
+.Movies {
+  width: 51px;
+  height: 18px;
+  margin-left: 6px;
+}
+.search-input {
+  margin-top: 20px;
+  padding-left: 10px;
+  width: 350px;
+  height: 40px;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px 0 rgba(132, 132, 132, 0.75);
+  border: solid 1px #c4c4c4;
+  background-color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  color: #383838;
+}
+.SearchButton {
+  margin-top: 24px;
+  width: 350px;
+  height: 34px;
+  border-radius: 20px;
+  border: solid 1px #c4c4c4;
+  background-color: #c4c4c4;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+}
+.SearchButton.active {
+  background-color: #0ab463;
+  cursor: pointer;
+}
+.results-div {
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px 0 rgba(132, 132, 132, 0.75);
+  border: solid 1px #dadada;
+  background-color: #ffffff;
+  width: 582px;
+  height: 582px;
+  margin-left: 30px;
+}
+.results {
+  width: 522px;
+  height: 32px;
+  margin-left: 30px;
+  padding-top: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+  border-bottom: 1px solid #c4c4c4;
+}
+
+.results-list {
+  list-style: none;
+  margin-top: 0;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 54px;
+  width: 522px;
+  margin-left: -10px;
+  border-bottom: 1px solid #c4c4c4;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.detail-button {
+  z-index: 100;
+  width: 134px;
+  height: 34px;
+  border-radius: 17px;
+  background-color: #0ab463;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+}
+.detail-button:hover {
+  background: #089954;
+  cursor: pointer;
+}
+.resutls-feedback-container {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 212px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  color: #c4c4c4;
+}
+@media screen and (max-width: 1024px) {
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .search-div {
+    margin-left: -142px;
+    margin-bottom: 30px;
+  }
+  .results-div {
+    margin-bottom: 30px;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .results-div {
+    width: 410px;
+    overflow-x: hidden;
+    margin-left: 0px;
+  }
+  .results {
+    width: 350px;
+  }
+  .result-item {
+    width: 350px;
+  }
+  .results-feedback-container {
+    width: 410px;
+    overflow-x: hidden;
+    margin-left: 0px;
+  }
+  .search-div {
+    margin-left: 0px;
+  }
 }
 </style>
