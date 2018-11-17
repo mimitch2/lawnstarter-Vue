@@ -1,92 +1,103 @@
 <template>
-  <div class="search-root">
-    <div class="content-wrapper">
-      <div class="search-div">
-        <div class="search-content-wrapper">
-          <p class="What-are-you-searching-for">What are you searching for?</p>
-          <form class="radio-group">
-            <input
-              type="radio"
-              name="type"
-              value="people"
-              class="Ellipse"
-              defaultChecked
-              v-model="type"
-            >
-            <label for="People" class="People">People</label>
-            <input type="radio" name="type" class="Ellipse" value="films" v-model="type">
-            <label for="Movies" class="Movies">Movies</label>
-          </form>
-          <form @submit.prevent="setResults">
-            <input
-              class="search-input"
-              type="text"
-              :placeholder="this.type === 'people' ? 'e.g. Chewbacca, Yoda, Boba Fett' : 'e.g. A New Hope, Phantom Menace'"
-              v-model="searchInput"
-            >
-            <button
-              v-bind:class="{ active: searchInput.length > 0 }"
-              class="SearchButton"
-              v-on:click="setResults"
-            >{{searchStatus ? "SEARCHING..." : "SEARCH"}}</button>
-          </form>
-        </div>
-      </div>
-      <div class="results-div">
-        <div class="results">Results</div>
-        <ul class="results-list" v-if="searchInput">
-          <li
-            class="result-item"
-            v-if="type === 'films' && resultsLoaded"
-            v-for="(item, index) in searchResult"
-            v-bind:key="index"
-          >
-            {{ item.title }}
-            <button class="detail-button">
-              <router-link v-bind:to="`/films/${item.title}`">SEE DETAILS</router-link>
-            </button>
-          </li>
-          <li
-            class="result-item"
-            v-if="type === 'people'"
-            v-for="(item, index) in searchResult"
-            v-bind:key="index"
-          >
-            {{ item.name }}
-            <button class="detail-button">
-              <router-link v-bind:to="`/people/${item.name}`">DETAILS</router-link>
-            </button>
-          </li>
-        </ul>
-        <div class="resutls-feedback-container">
-          <div class="results-feedback-message" v-if="searchResult.length === 0 && !searchStatus">
-            <p class="results-feedback-text">There are no matches.</p>
-            <p class="results-feedback-text">Use the form to search for People or Movies.</p>
+  <transition name="fade">
+    <div class="search-root" v-show="show">
+      <div class="content-wrapper">
+        <div class="search-div">
+          <div class="search-content-wrapper">
+            <p class="What-are-you-searching-for">What are you searching for?</p>
+            <form class="radio-group">
+              <input
+                type="radio"
+                name="type"
+                value="people"
+                class="Ellipse"
+                defaultChecked
+                v-model="type"
+              >
+              <label for="People" class="People">People</label>
+              <input type="radio" name="type" class="Ellipse" value="films" v-model="type">
+              <label for="Movies" class="Movies">Movies</label>
+            </form>
+            <form @submit.prevent="setResults">
+              <input
+                class="search-input"
+                type="text"
+                :placeholder="this.type === 'people' ? 'e.g. Chewbacca, Yoda, Boba Fett' : 'e.g. A New Hope, Phantom Menace'"
+                v-model="searchInput"
+              >
+              <button
+                v-bind:class="{ active: searchInput.length > 0 }"
+                class="SearchButton"
+                v-on:click="setResults"
+              >{{searchStatus ? "SEARCHING..." : "SEARCH"}}</button>
+            </form>
           </div>
-          <div class="resutls-feedback-message" v-if="searchStatus">
-            <p>Searching...</p>
+        </div>
+        <div class="results-div">
+          <div class="results">Results</div>
+          <ul class="results-list">
+            <li
+              class="result-item"
+              v-if="type === 'films'"
+              v-for="(item, index) in searchResult"
+              v-bind:key="index"
+            >
+              {{ item.title }}
+              <button class="detail-button">
+                <router-link v-bind:to="`/films/${item.title}`">SEE DETAILS</router-link>
+              </button>
+            </li>
+            <!-- ****************** -->
+            <transition-group name="fade" tag="li">
+              <li
+                class="result-item"
+                v-if="type === 'people'"
+                v-for="(item, index) in searchResult"
+                v-bind:key="index"
+              >
+                {{ item.name }}
+                <button class="detail-button">
+                  <router-link v-bind:to="`/people/${item.name}`">DETAILS</router-link>
+                </button>
+              </li>
+            </transition-group>
+          </ul>
+          <!-- ****************************** -->
+          <div class="resutls-feedback-container">
+            <div class="results-feedback-message" v-if="searchResult.length === 0 && !searchStatus">
+              <p class="results-feedback-text">There are no matches.</p>
+              <p class="results-feedback-text">Use the form to search for People or Movies.</p>
+            </div>
+            <div class="resutls-feedback-message" v-if="searchStatus">
+              <p>Searching...</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
 export default {
   name: 'search',
-  beforeMount () {
-    this.clearResults()
+  beforeMount() {
+    this.show = true;
+    this.clearResults();
   },
-  data () {
+  beforeDestroy() {
+    this.show = true;
+  },
+  data() {
     return {
+      show: false,
       searchInput: '',
       type: 'people',
       placeholder:
         this.type === 'people' ? 'e.g Chewbaca,...' : 'e.g. A New Hope...',
       searchStatus: false
-    }
+    };
   },
   computed: {
     ...mapState(['searchResult', 'resultsLoaded']),
@@ -94,42 +105,52 @@ export default {
   },
 
   watch: {
-    resultsLoaded () {
+    resultsLoaded() {
       if (this.resultsLoaded) {
-        this.searchStatus = false
+        this.searchStatus = false;
       }
     },
-    searchInput () {
+    searchInput() {
       if (!this.searchInput) {
-        this.SET_RESULTS([])
-        this.SET_RESULTS_LOADED(false)
+        this.SET_RESULTS([]);
+        this.SET_RESULTS_LOADED(false);
       }
     },
-    type () {
-      this.SET_RESULTS([])
-      this.SET_RESULTS_LOADED(false)
+    type() {
+      this.SET_RESULTS([]);
+      this.SET_RESULTS_LOADED(false);
     }
   },
   methods: {
     ...mapMutations(['SET_RESULTS', 'SET_RESULTS_LOADED']),
     ...mapActions(['fetchData']),
-    setResults: function () {
+    setResults: function() {
       if (this.searchInput) {
-        this.SET_RESULTS([])
-        this.SET_RESULTS_LOADED(false)
-        this.fetchData([this.type, this.searchInput])
-        this.searchStatus = true
+        this.SET_RESULTS([]);
+        this.SET_RESULTS_LOADED(false);
+        this.fetchData([this.type, this.searchInput]);
+        this.searchStatus = true;
       }
     },
-    clearResults: function () {
-      this.SET_RESULTS([])
-      this.SET_RESULTS_LOADED(false)
+    clearResults: function() {
+      this.SET_RESULTS([]);
+      this.SET_RESULTS_LOADED(false);
     }
   }
-}
+};
 </script>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transform: translateX(0px);
+  transition: all 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  transform: translateX(-10px);
+  opacity: 0;
+}
 .search-root {
   margin-top: 80px;
 }
