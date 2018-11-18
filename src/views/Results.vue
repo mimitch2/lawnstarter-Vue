@@ -141,14 +141,14 @@ a {
   color: #ffffff !important;
   text-decoration: none;
 }
-
 .results-root {
   display: flex;
   justify-content: center;
   overflow-y: hidden;
 }
 .details-card {
-  /* max-height: 417px; */
+  max-height: 900px;
+  min-height: 417px;
   overflow: hidden;
   transition: max-height 1s linear;
   margin-top: 80px;
@@ -158,9 +158,6 @@ a {
   border: solid 1px #dadada;
   background-color: #ffffff;
   display: flex;
-}
-.details-card {
-  max-height: 900px;
 }
 .details-card-left {
   width: 322px;
@@ -173,7 +170,6 @@ a {
   font-weight: bold;
   color: #000000;
 }
-
 .details-title {
   width: 322px;
   font-size: 16px;

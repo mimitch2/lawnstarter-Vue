@@ -36,18 +36,21 @@
         <div class="results-div">
           <div class="results">Results</div>
           <ul class="results-list">
-            <li
-              class="result-item"
-              v-if="type === 'films'"
-              v-for="(item, index) in searchResult"
-              v-bind:key="index"
-            >
-              {{ item.title }}
-              <button class="detail-button">
-                <router-link v-bind:to="`/films/${item.title}`">SEE DETAILS</router-link>
-              </button>
-            </li>
-            <!-- ****************** -->
+            <!-- ****************************** -->
+            <transition-group name="fade" tag="li">
+              <li
+                class="result-item"
+                v-if="type === 'films'"
+                v-for="(item, index) in searchResult"
+                v-bind:key="index"
+              >
+                {{ item.title }}
+                <button class="detail-button">
+                  <router-link v-bind:to="`/films/${item.title}`">SEE DETAILS</router-link>
+                </button>
+              </li>
+            </transition-group>
+            <!-- ****************************** -->
             <transition-group name="fade" tag="li">
               <li
                 class="result-item"
@@ -79,17 +82,17 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 export default {
   name: 'search',
-  beforeMount() {
-    this.show = true;
-    this.clearResults();
+  beforeMount () {
+    this.show = true
+    this.clearResults()
   },
-  beforeDestroy() {
-    this.show = true;
+  beforeDestroy () {
+    this.show = true
   },
-  data() {
+  data () {
     return {
       show: false,
       searchInput: '',
@@ -97,7 +100,7 @@ export default {
       placeholder:
         this.type === 'people' ? 'e.g Chewbaca,...' : 'e.g. A New Hope...',
       searchStatus: false
-    };
+    }
   },
   computed: {
     ...mapState(['searchResult', 'resultsLoaded']),
@@ -105,39 +108,39 @@ export default {
   },
 
   watch: {
-    resultsLoaded() {
+    resultsLoaded () {
       if (this.resultsLoaded) {
-        this.searchStatus = false;
+        this.searchStatus = false
       }
     },
-    searchInput() {
+    searchInput () {
       if (!this.searchInput) {
-        this.SET_RESULTS([]);
-        this.SET_RESULTS_LOADED(false);
+        this.SET_RESULTS([])
+        this.SET_RESULTS_LOADED(false)
       }
     },
-    type() {
-      this.SET_RESULTS([]);
-      this.SET_RESULTS_LOADED(false);
+    type () {
+      this.SET_RESULTS([])
+      this.SET_RESULTS_LOADED(false)
     }
   },
   methods: {
     ...mapMutations(['SET_RESULTS', 'SET_RESULTS_LOADED']),
     ...mapActions(['fetchData']),
-    setResults: function() {
+    setResults: function () {
       if (this.searchInput) {
-        this.SET_RESULTS([]);
-        this.SET_RESULTS_LOADED(false);
-        this.fetchData([this.type, this.searchInput]);
-        this.searchStatus = true;
+        this.SET_RESULTS([])
+        this.SET_RESULTS_LOADED(false)
+        this.fetchData([this.type, this.searchInput])
+        this.searchStatus = true
       }
     },
-    clearResults: function() {
-      this.SET_RESULTS([]);
-      this.SET_RESULTS_LOADED(false);
+    clearResults: function () {
+      this.SET_RESULTS([])
+      this.SET_RESULTS_LOADED(false)
     }
   }
-};
+}
 </script>
 
 <style scoped>
