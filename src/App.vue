@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <Header/>
+    <SWHeader/>
     <router-view/>
   </div>
 </template>
 
 <script>
-import Header from './views/Header.vue'
+import SWHeader from './views/Header.vue'
 export default {
   name: 'app',
   components: {
-    Header
+    SWHeader
   }
 }
 </script>

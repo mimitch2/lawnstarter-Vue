@@ -37,7 +37,7 @@
           <div class="results">Results</div>
           <ul class="results-list">
             <!-- ****************************** -->
-            <transition-group name="fade" tag="li">
+            <transition-group name="list-fade" tag="li">
               <li
                 class="result-item"
                 v-if="type === 'films'"
@@ -51,7 +51,7 @@
               </li>
             </transition-group>
             <!-- ****************************** -->
-            <transition-group name="fade" tag="li">
+            <transition-group name="list-fade" tag="li">
               <li
                 class="result-item"
                 v-if="type === 'people'"
@@ -145,11 +145,13 @@ export default {
 
 <style scoped>
 .fade-enter-active,
-.fade-leave-active {
+.fade-leave-active,
+.list-fade-enter-active {
   transform: translateX(0px);
   transition: all 0.5s;
 }
 .fade-enter,
+.list-fade-enter,
 .fade-leave-to {
   transform: translateX(-10px);
   opacity: 0;

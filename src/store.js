@@ -51,7 +51,6 @@ export default new Vuex.Store({
     },
 
     async getDetails (context, array) {
-      console.log(array)
       let tempArr = []
       for (let i = 0; i < array.length; i++) {
         try {

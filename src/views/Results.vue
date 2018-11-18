@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <div class="results-root" v-show="show">
-      <div class="details-card">
+      <div class="details-card" id="details" v-bind:class="{ grow: type === 'films'}">
         <div class="details-card-left">
           <p class="result-name">{{ this.$route.params.id }}</p>
           <p class="details-title" v-if="type === 'films'">Opening Crawl</p>
@@ -44,9 +44,9 @@
                 v-if="type === 'people' && detailsLoaded"
                 v-for="(item, index) in details"
                 v-bind:key="index"
-              >{{ item.title }},&nbsp;</router-link>
+              >{{ item.title }}{{ index !== details.length - 1 ? ', ' : ''}}</router-link>
             </div>
-            <div class="details-loading" v-if="!detailsLoaded">
+            <div class="details-loading-right" v-if="!detailsLoaded">
               <p class="loading-text">Loading...</p>
             </div>
           </div>
@@ -147,10 +147,9 @@ a {
   overflow-y: hidden;
 }
 .details-card {
-  max-height: 900px;
-  min-height: 417px;
+  max-height: 417px;
   overflow: hidden;
-  transition: max-height 1s linear;
+  transition: max-height 0.5s linear;
   margin-top: 80px;
   width: 804px;
   border-radius: 4px;
@@ -159,7 +158,12 @@ a {
   background-color: #ffffff;
   display: flex;
 }
+.details-card.grow {
+  max-height: 900px;
+  transition: max-height 1s linear;
+}
 .details-card-left {
+  min-height: 206px;
   width: 322px;
   margin-left: 30px;
 }
@@ -185,8 +189,10 @@ a {
   min-height: 206px;
 }
 .details-list {
+  height: 206px;
   list-style: none;
   padding: 0;
+  margin: 0px;
 }
 .details-list-item {
   padding: 0;
@@ -197,6 +203,7 @@ a {
   color: #000000;
 }
 .opening-crawl-text {
+  min-height: 206px;
   white-space: pre-line;
   width: 220px;
   font-size: 14px;
@@ -204,6 +211,9 @@ a {
   color: #000000;
 }
 .details-loading {
+  padding: 0;
+  margin: 0px;
+  height: 206px;
   text-align: left;
   font-size: 14px;
   font-weight: bold;
@@ -241,13 +251,14 @@ a {
   margin-bottom: 5px;
 }
 .right-list-container {
+  min-height: 206px;
   margin-top: 16px;
   width: 322px;
   font-size: 14px;
   font-weight: normal;
   color: #0094ff;
 }
-.details-loading {
+.details-loading-right {
   text-align: left;
   font-size: 14px;
   font-weight: bold;
