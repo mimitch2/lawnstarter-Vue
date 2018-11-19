@@ -10,11 +10,6 @@ export default new Vuex.Store({
     searchResult: [],
     details: []
   },
-  getters: {
-    // countLinks: state => {
-    //   return state.links.length
-    // }
-  },
   mutations: {
     SET_RESULTS: (state, result) => {
       state.searchResult = result
@@ -49,7 +44,6 @@ export default new Vuex.Store({
         console.log(error)
       }
     },
-
     async getDetails (context, array) {
       let tempArr = []
       for (let i = 0; i < array.length; i++) {

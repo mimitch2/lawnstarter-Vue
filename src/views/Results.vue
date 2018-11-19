@@ -4,9 +4,9 @@
       <div class="details-card" id="details" v-bind:class="{ grow: type === 'films'}">
         <div class="details-card-left">
           <p class="result-name">{{ this.$route.params.id }}</p>
-          <p class="details-title" v-if="type === 'films'">Opening Crawl</p>
-          <p class="details-title" v-if="type === 'people'">Details</p>
+          <p class="details-title">{{ type === 'films' ? 'Opening Crawl' : 'Details'}}</p>
           <div class="details-wrapper">
+            <!-- <transition name="details-fade"> -->
             <ul class="details-list" v-if="type === 'people' && resultsLoaded">
               <li class="details-list-item">Birth Year: {{ searchResult[0].birth_year }}</li>
               <li class="details-list-item">Gender: {{ searchResult[0].gender }}</li>
@@ -15,23 +15,23 @@
               <li class="details-list-item">Height: {{ searchResult[0].height }}</li>
               <li class="details-list-item">Mass: {{ searchResult[0].mass}}</li>
             </ul>
+            <!-- </transition> -->
+            <!-- <transition name="details-fade"> -->
             <div class="opening-crawl-text" v-if="type === 'films' && resultsLoaded">
               <div>{{ searchResult[0].opening_crawl }}</div>
             </div>
-            <div class="details-loading" v-else-if="!resultsLoaded">
+            <!-- </transition> -->
+            <div class="details-loading" v-if="!resultsLoaded">
               <p class="loading-text">Loading...</p>
             </div>
           </div>
-          <!-- <button class="back-to-search-button">
-            <router-link class="button-link" v-bind:to="'/'">BACK TO SEARCH</router-link>
-          </button>-->
-          <div class="button-wrapper">
+          <div class="back-button-wrapper">
             <BasicButton
               v-bind:clickMethod="() => clickRoute('/')"
               v-bind:activeProp="true"
               v-bind:hoverProp="true"
               v-bind:labelStatus="true"
-              v-bind:label="{secondary: 'BACK TO SEARCH'}"
+              v-bind:label="{ secondary: 'BACK TO SEARCH' }"
             />
           </div>
         </div>
@@ -40,20 +40,14 @@
           <p class="details-right" v-else>Movies</p>
           <div class="right-list-container">
             <div v-on:click="resetAll">
-              <router-link
-                v-bind:to="`/people/${item.name}`"
-                v-if="type === 'films' && detailsLoaded"
-                v-for="(item, index) in details"
-                v-bind:key="index"
-              >{{ item.name }}{{ index !== details.length - 1 ? ', ' : ''}}</router-link>
-            </div>
-            <div v-on:click="resetAll">
-              <router-link
-                v-bind:to="`/films/${item.title}`"
-                v-if="type === 'people' && detailsLoaded"
-                v-for="(item, index) in details"
-                v-bind:key="index"
-              >{{ item.title }}{{ index !== details.length - 1 ? ', ' : ''}}</router-link>
+              <transition-group name="details-fade">
+                <router-link
+                  v-if="detailsLoaded"
+                  v-bind:to=" type === 'films' ? `/people/${item.name}` : `/films/${item.title}`"
+                  v-for="(item, index) in details"
+                  v-bind:key="index"
+                >{{ type === 'films' ? item.name : item.title }}{{ index !== details.length - 1 ? ', ' : ''}}</router-link>
+              </transition-group>
             </div>
             <div class="details-loading-right" v-if="!detailsLoaded">
               <p class="loading-text">Loading...</p>
@@ -67,7 +61,7 @@
 
 <script>
 import BasicButton from './Button.vue'
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 export default {
   name: 'results',
   components: {
@@ -88,8 +82,12 @@ export default {
     }
   },
   computed: {
-    ...mapState(['searchResult', 'resultsLoaded', 'details', 'detailsLoaded']),
-    ...mapGetters([])
+    ...mapState(['searchResult', 'resultsLoaded', 'details', 'detailsLoaded'])
+  },
+  watch: {
+    $route: function (to, from) {
+      this.resetAll()
+    }
   },
   methods: {
     ...mapMutations([
@@ -136,8 +134,17 @@ export default {
 </script>
 
 <style scoped>
+.details-fade-enter-active {
+  opacity: 1;
+  transition: all 0.5s;
+}
+.details-fade-enter {
+  opacity: 0;
+}
+
 .fade-enter-active,
 .fade-leave-active {
+  opacity: 1;
   transform: translateX(0px);
   transition: all 0.5s;
 }
@@ -176,7 +183,7 @@ a {
 }
 .details-card.grow {
   max-height: 900px;
-  transition: max-height 1s linear;
+  transition: max-height 0.5s linear;
 }
 .details-card-left {
   min-height: 206px;
@@ -220,7 +227,7 @@ a {
 }
 .opening-crawl-text {
   min-height: 206px;
-  white-space: pre-line;
+  white-space: pre;
   width: 220px;
   font-size: 14px;
   font-weight: normal;
@@ -235,20 +242,8 @@ a {
   font-weight: bold;
   color: #c4c4c4;
 }
-/* .back-to-search-button {
-  margin-top: 30px;
-  margin-bottom: 30px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #ffffff !important;
+.back-button-wrapper {
   width: 187px;
-  height: 34px;
-  border-radius: 17px;
-  border: solid 1px #089954;
-  background-color: #089954;
-} */
-.button-wrapper {
-  width: 350px;
   height: 34px;
   margin-top: 30px;
   margin-bottom: 30px;
@@ -289,6 +284,7 @@ a {
 
 @media screen and (max-width: 960px) {
   .details-card {
+    max-height: 900px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -300,7 +296,11 @@ a {
   }
   .details-card-right {
     margin-left: -160px;
-    margin-top: -60px;
+    /* margin-top: -60px; */
+    margin-bottom: 30px;
+  }
+  .back-button-wrapper {
+    margin-top: 30px;
     margin-bottom: 30px;
   }
 }

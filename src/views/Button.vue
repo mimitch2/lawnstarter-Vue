@@ -21,6 +21,12 @@ export default {
 
 <style>
 .basic-button {
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  overflow-x: hidden;
   height: 100%;
   width: 100%;
   border-radius: 20px;

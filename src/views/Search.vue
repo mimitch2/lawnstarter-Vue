@@ -39,38 +39,20 @@
         <div class="results-div">
           <div class="results">Results</div>
           <ul class="results-list">
-            <!-- ****************************** -->
             <transition-group name="list-fade" tag="li">
               <li
                 class="result-item"
-                v-if="type === 'films'"
-                v-for="(item, index) in searchResult"
+                v-for="({ name, title }, index) in searchResult"
                 v-bind:key="index"
               >
-                {{ item.title }}
+                {{ type === 'people' ? name : title }}
                 <div class="detail-button-wrapper">
                   <BasicButton
-                    v-bind:clickMethod="() => clickRoute(`/films/${item.title}`)"
-                    v-bind:activeProp="true"
-                    v-bind:hoverProp="true"
-                    v-bind:labelStatus="true"
-                    v-bind:label="{ secondary: 'SEE DETALS' }"
-                  />
-                </div>
-              </li>
-            </transition-group>
-            <!-- ****************************** -->
-            <transition-group name="list-fade" tag="li">
-              <li
-                class="result-item"
-                v-if="type === 'people'"
-                v-for="(item, index) in searchResult"
-                v-bind:key="index"
-              >
-                {{ item.name }}
-                <div class="detail-button-wrapper">
-                  <BasicButton
-                    v-bind:clickMethod="() => clickRoute(`/people/${item.name}`)"
+                    v-bind:clickMethod="() => {
+                      type === 'people' ?
+                      clickRoute(`/people/${name}`) :
+                      clickRoute(`/films/${title}`)
+                      }"
                     v-bind:activeProp="true"
                     v-bind:hoverProp="true"
                     v-bind:labelStatus="true"
@@ -80,7 +62,6 @@
               </li>
             </transition-group>
           </ul>
-          <!-- ****************************** -->
           <div class="resutls-feedback-container">
             <div class="results-feedback-message" v-if="searchResult.length === 0 && !searchStatus">
               <p class="results-feedback-text">There are no matches.</p>
@@ -98,7 +79,7 @@
 
 <script>
 import BasicButton from './Button.vue'
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 export default {
   name: 'search',
   components: {
@@ -122,10 +103,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(['searchResult', 'resultsLoaded']),
-    ...mapGetters([])
+    ...mapState(['searchResult', 'resultsLoaded'])
   },
-
   watch: {
     resultsLoaded () {
       if (this.resultsLoaded) {
@@ -179,6 +158,7 @@ export default {
   transform: translateX(-10px);
   opacity: 0;
 }
+
 .search-root {
   margin-top: 80px;
 }
@@ -268,7 +248,6 @@ button:focus {
   font-weight: bold;
   color: #ffffff;
 }
-
 .SearchButton.active {
   background-color: #0ab463;
   cursor: pointer;
@@ -294,12 +273,10 @@ button:focus {
   color: #000000;
   border-bottom: 1px solid #c4c4c4;
 }
-
 .results-list {
   list-style: none;
   margin-top: 0;
 }
-
 .result-item {
   display: flex;
   justify-content: space-between;
@@ -312,9 +289,7 @@ button:focus {
   font-weight: bold;
   color: #000000;
 }
-
 .detail-button {
-  z-index: 100;
   width: 134px;
   height: 34px;
   border-radius: 17px;
@@ -323,7 +298,6 @@ button:focus {
   font-weight: bold;
   color: #ffffff;
 }
-
 .detail-button-wrapper {
   width: 134px;
   height: 34px;
@@ -356,7 +330,6 @@ button:focus {
     margin-bottom: 30px;
   }
 }
-
 @media screen and (max-width: 720px) {
   .results-div {
     width: 410px;

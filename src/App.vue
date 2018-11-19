@@ -20,6 +20,7 @@ html {
   background: #ededed;
 }
 body {
+  overflow-y: scroll;
   padding: 0;
   margin: 0;
 }
