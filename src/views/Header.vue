@@ -1,10 +1,13 @@
 <template>
-  <div class="header">SWStarter</div>
+  <div class="header">{{ title }}</div>
 </template>
 
 <script>
 export default {
-  name: 'SWHeader'
+  name: 'SWHeader',
+  props: {
+    title: String
+  }
 }
 </script>
 

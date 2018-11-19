@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <SWHeader/>
+    <SWHeader title="SWStarter"/>
     <router-view/>
   </div>
 </template>

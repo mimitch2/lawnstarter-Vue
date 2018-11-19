@@ -25,11 +25,14 @@
                 :placeholder="this.type === 'people' ? 'e.g. Chewbacca, Yoda, Boba Fett' : 'e.g. A New Hope, Phantom Menace'"
                 v-model="searchInput"
               >
-              <button
-                v-bind:class="{ active: searchInput.length > 0 }"
-                class="SearchButton"
-                v-on:click="setResults"
-              >{{searchStatus ? "SEARCHING..." : "SEARCH"}}</button>
+              <div class="button-wrapper">
+                <BasicButton
+                  v-bind:clickMethod="setResults"
+                  v-bind:activeProp="searchInput.length > 0"
+                  v-bind:labelStatus="searchStatus"
+                  v-bind:label="{primary: 'SEARCH', secondary: 'SEARCHING...'}"
+                />
+              </div>
             </form>
           </div>
         </div>
@@ -45,9 +48,15 @@
                 v-bind:key="index"
               >
                 {{ item.title }}
-                <button class="detail-button">
-                  <router-link v-bind:to="`/films/${item.title}`">SEE DETAILS</router-link>
-                </button>
+                <div class="detail-button-wrapper">
+                  <BasicButton
+                    v-bind:clickMethod="() => clickRoute(`/films/${item.title}`)"
+                    v-bind:activeProp="true"
+                    v-bind:hoverProp="true"
+                    v-bind:labelStatus="true"
+                    v-bind:label="{ secondary: 'SEE DETALS' }"
+                  />
+                </div>
               </li>
             </transition-group>
             <!-- ****************************** -->
@@ -59,9 +68,15 @@
                 v-bind:key="index"
               >
                 {{ item.name }}
-                <button class="detail-button">
-                  <router-link v-bind:to="`/people/${item.name}`">DETAILS</router-link>
-                </button>
+                <div class="detail-button-wrapper">
+                  <BasicButton
+                    v-bind:clickMethod="() => clickRoute(`/people/${item.name}`)"
+                    v-bind:activeProp="true"
+                    v-bind:hoverProp="true"
+                    v-bind:labelStatus="true"
+                    v-bind:label="{ secondary: 'SEE DETALS' }"
+                  />
+                </div>
               </li>
             </transition-group>
           </ul>
@@ -82,9 +97,13 @@
 </template>
 
 <script>
+import BasicButton from './Button.vue'
 import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 export default {
   name: 'search',
+  components: {
+    BasicButton
+  },
   beforeMount () {
     this.show = true
     this.clearResults()
@@ -138,6 +157,10 @@ export default {
     clearResults: function () {
       this.SET_RESULTS([])
       this.SET_RESULTS_LOADED(false)
+    },
+    clickRoute: function (url) {
+      console.log(url)
+      this.$router.push(url)
     }
   }
 }
@@ -218,6 +241,7 @@ button:focus {
 .search-input {
   margin-top: 20px;
   padding-left: 10px;
+  box-sizing: border-box;
   width: 350px;
   height: 40px;
   border-radius: 4px;
@@ -227,6 +251,11 @@ button:focus {
   font-size: 14px;
   font-weight: bold;
   color: #383838;
+}
+.button-wrapper {
+  width: 350px;
+  height: 34px;
+  margin-top: 24px;
 }
 .SearchButton {
   margin-top: 24px;
@@ -239,6 +268,7 @@ button:focus {
   font-weight: bold;
   color: #ffffff;
 }
+
 .SearchButton.active {
   background-color: #0ab463;
   cursor: pointer;
@@ -292,6 +322,11 @@ button:focus {
   font-size: 14px;
   font-weight: bold;
   color: #ffffff;
+}
+
+.detail-button-wrapper {
+  width: 134px;
+  height: 34px;
 }
 .detail-button:hover {
   background: #089954;

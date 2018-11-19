@@ -22,9 +22,18 @@
               <p class="loading-text">Loading...</p>
             </div>
           </div>
-          <button class="back-to-search-button">
+          <!-- <button class="back-to-search-button">
             <router-link class="button-link" v-bind:to="'/'">BACK TO SEARCH</router-link>
-          </button>
+          </button>-->
+          <div class="button-wrapper">
+            <BasicButton
+              v-bind:clickMethod="() => clickRoute('/')"
+              v-bind:activeProp="true"
+              v-bind:hoverProp="true"
+              v-bind:labelStatus="true"
+              v-bind:label="{secondary: 'BACK TO SEARCH'}"
+            />
+          </div>
         </div>
         <div class="details-card-right">
           <p class="details-right" v-if="type === 'films'">Characters</p>
@@ -57,9 +66,13 @@
 </template>
 
 <script>
+import BasicButton from './Button.vue'
 import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 export default {
   name: 'results',
+  components: {
+    BasicButton
+  },
   beforeMount () {
     this.resetAll()
     this.show = true
@@ -114,6 +127,9 @@ export default {
       this.clearDetails()
       this.clearResults()
       this.setResults([type, id])
+    },
+    clickRoute: function (url) {
+      this.$router.push(url)
     }
   }
 }
@@ -219,7 +235,7 @@ a {
   font-weight: bold;
   color: #c4c4c4;
 }
-.back-to-search-button {
+/* .back-to-search-button {
   margin-top: 30px;
   margin-bottom: 30px;
   font-size: 14px;
@@ -230,6 +246,12 @@ a {
   border-radius: 17px;
   border: solid 1px #089954;
   background-color: #089954;
+} */
+.button-wrapper {
+  width: 350px;
+  height: 34px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 .details-card-right {
   width: 322px;
